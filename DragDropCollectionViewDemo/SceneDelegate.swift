@@ -20,7 +20,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else {return}
         window = UIWindow(frame: windowScene.coordinateSpace.bounds)
         window?.windowScene = windowScene
-        window?.rootViewController = ViewController()
+        let layout = UICollectionViewFlowLayout()
+        let photoGridCollectionViewController = PhotoGridCollectionViewController(collectionViewLayout: layout)
+        let navController = UINavigationController(rootViewController: photoGridCollectionViewController)
+        window?.rootViewController = navController
         window?.makeKeyAndVisible()
     }
 
