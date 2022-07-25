@@ -17,11 +17,14 @@ class PhotoGridCollectionViewController: UICollectionViewController {
         collectionView.backgroundColor = .white
         setUpCollectionView()
         configureNavBar()
+        setUpGestureRecognizers()
     }
     
     
     //MARK: - Properties
     private var colors = [UIColor]()
+    private var longPressedEnabled = false
+
 
     
     //MARK: - Methods
@@ -51,6 +54,19 @@ class PhotoGridCollectionViewController: UICollectionViewController {
     }
     
     
+    private func setUpGestureRecognizers() {
+
+        // SET UP HERE
+        
+        let longGestureGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPressGesture))
+        collectionView.addGestureRecognizer(longGestureGesture)
+        
+    }
+    
+    
+    
+
+    
     
     //MARK: - Target Selectors
     @objc fileprivate func didTapAddItem() {
@@ -59,8 +75,24 @@ class PhotoGridCollectionViewController: UICollectionViewController {
         let indexPath = IndexPath(item: 0, section: 0)
         collectionView.insertItems(at: [indexPath])
     }
+    
+    
+    @objc fileprivate func handleLongPressGesture(gesture: UILongPressGestureRecognizer) {
+        switch gesture.state {
+        case .began:
+            guard let targetIndexPath = collectionView.indexPathForItem(at: gesture.location(in: collectionView)) else {return}
+            collectionView.beginInteractiveMovementForItem(at: targetIndexPath)
+        case .changed:
+            collectionView.updateInteractiveMovementTargetPosition(gesture.location(in: collectionView))
+        case .ended:
+            collectionView.endInteractiveMovement()
+         default:
+            collectionView.cancelInteractiveMovement()
+        }
+    }
+    
 }
-
+    
 
 //MARK: - CollectionView Delegates
 extension PhotoGridCollectionViewController: UICollectionViewDelegateFlowLayout {
@@ -69,31 +101,65 @@ extension PhotoGridCollectionViewController: UICollectionViewDelegateFlowLayout 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.cellReuseIdentifier, for: indexPath) as! PhotoCell
         cell.backgroundColor = colors[indexPath.item].withAlphaComponent(0.8)
+        cell.layer.cornerRadius = 8
         return cell
     }
     
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let dimen = view.frame.width / 3 - 1
+        let dimen = view.frame.width / 3.5 //- 1
         return CGSize(width: dimen, height: dimen)
     }
     
     
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return .init(top: 0, left: 8, bottom: 0, right: 8)
+    }
+    
+    
+    override func numberOfSections(in collectionView: UICollectionView) -> Int {
+        2
+    }
+
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return colors.count
     }
     
 
-    
+
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 1
+        return 10
     }
-    
-    
+
+
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 0
     }
     
+    
+    
+    // Responsible for collectionView Re-order
+    override func collectionView(_ collectionView: UICollectionView, canMoveItemAt indexPath: IndexPath) -> Bool {
+        switch indexPath.section {
+        case 0:
+            return true
+        case 1:
+            return true
+        default:
+            return true
+        }
+    }
+   
+    
+    override func collectionView(_ collectionView: UICollectionView,
+                                 moveItemAt sourceIndexPath: IndexPath,
+                                 to destinationIndexPath: IndexPath) {
+        
+        // first grab and remove item at sourceIndex
+        let item = colors.remove(at: sourceIndexPath.item)
+        colors.insert(item, at: destinationIndexPath.item)
+        
+    }
     
     
 }
