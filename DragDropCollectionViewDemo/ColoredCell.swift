@@ -46,7 +46,7 @@ class ColoredCell: UICollectionViewCell {
     
     func bindDataToCell(with item: ItemViewModel) {
         layer.cornerRadius = 8
-        titleLabel.text = String(item.number)
+        titleLabel.text = item.alphabet
         backgroundColor = item.color.withAlphaComponent(0.8)
     }
     
