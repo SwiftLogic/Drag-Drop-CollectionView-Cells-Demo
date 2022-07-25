@@ -22,17 +22,19 @@ class PhotoGridCollectionViewController: UICollectionViewController {
     
     
     //MARK: - Properties
-    private var colors = [UIColor]()
+    private var items = [ItemViewModel]()
     private var longPressedEnabled = false
 
 
     
     //MARK: - Methods
     fileprivate func setUpCollectionView() {
-        collectionView.register(PhotoCell.self, forCellWithReuseIdentifier: PhotoCell.cellReuseIdentifier)
+        collectionView.register(ColoredCell.self, forCellWithReuseIdentifier: ColoredCell.cellReuseIdentifier)
+        collectionView.register(SectionTitleHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: SectionTitleHeader.cellReuseIdentifier)
                 
-        for _ in 0 ... 20 {
-            colors.append(generateRandomColor())
+        for number in 0 ... 20 {
+            let item = ItemViewModel(color: generateRandomColor(), number: number)
+            items.append(item)
         }
         
     }
@@ -70,8 +72,9 @@ class PhotoGridCollectionViewController: UICollectionViewController {
     
     //MARK: - Target Selectors
     @objc fileprivate func didTapAddItem() {
-        let colorItem = generateRandomColor()
-        colors.insert(colorItem, at: 0)
+        let number = items.count 
+        let item = ItemViewModel(color: generateRandomColor(), number: number)
+        items.insert(item, at: 0)
         let indexPath = IndexPath(item: 0, section: 0)
         collectionView.insertItems(at: [indexPath])
     }
@@ -99,9 +102,8 @@ extension PhotoGridCollectionViewController: UICollectionViewDelegateFlowLayout 
     
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.cellReuseIdentifier, for: indexPath) as! PhotoCell
-        cell.backgroundColor = colors[indexPath.item].withAlphaComponent(0.8)
-        cell.layer.cornerRadius = 8
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ColoredCell.cellReuseIdentifier, for: indexPath) as! ColoredCell
+        cell.bindDataToCell(with: items[indexPath.item])
         return cell
     }
     
@@ -122,7 +124,7 @@ extension PhotoGridCollectionViewController: UICollectionViewDelegateFlowLayout 
     }
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return colors.count
+        return items.count
     }
     
 
@@ -135,6 +137,43 @@ extension PhotoGridCollectionViewController: UICollectionViewDelegateFlowLayout 
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
         return 0
     }
+    
+    
+    fileprivate func setUpHeaderTitleLabel(imageName: String, title: String) -> NSAttributedString {
+        let imageAttachment = NSTextAttachment()
+        imageAttachment.image = UIImage(systemName: imageName)?.withTintColor(.black)
+        let fullString = NSMutableAttributedString(string: "")
+        fullString.append(NSAttributedString(attachment: imageAttachment))
+        fullString.append(NSAttributedString(string: " \(title) "))
+        return fullString
+    }
+    
+    
+    override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: SectionTitleHeader.cellReuseIdentifier, for: indexPath) as! SectionTitleHeader
+        
+        switch indexPath.section {
+        case 0:
+            let attributedText = setUpHeaderTitleLabel(imageName: "rectangle.grid.3x2.fill", title: "Section 0")
+            header.titleLabel.attributedText = attributedText
+            
+        case 1:
+            let attributedText = setUpHeaderTitleLabel(imageName: "rectangle.grid.3x2.fill", title: "Section 1")
+            header.titleLabel.attributedText = attributedText
+            
+        default:
+            break
+        }
+        return header
+    }
+    
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        
+        return CGSize(width: view.frame.width, height: 60)
+
+    }
+    
     
     
     
@@ -151,13 +190,12 @@ extension PhotoGridCollectionViewController: UICollectionViewDelegateFlowLayout 
     }
    
     
-    override func collectionView(_ collectionView: UICollectionView,
-                                 moveItemAt sourceIndexPath: IndexPath,
+    override func collectionView(_ collectionView: UICollectionView, moveItemAt sourceIndexPath: IndexPath,
                                  to destinationIndexPath: IndexPath) {
         
         // first grab and remove item at sourceIndex
-        let item = colors.remove(at: sourceIndexPath.item)
-        colors.insert(item, at: destinationIndexPath.item)
+        let item = items.remove(at: sourceIndexPath.item)
+        items.insert(item, at: destinationIndexPath.item)
         
     }
     
@@ -167,3 +205,7 @@ extension PhotoGridCollectionViewController: UICollectionViewDelegateFlowLayout 
 
 
 
+struct ItemViewModel {
+    let color: UIColor
+    let number: Int
+}
