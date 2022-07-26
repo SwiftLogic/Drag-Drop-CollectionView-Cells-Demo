@@ -6,7 +6,12 @@
 //
 
 import UIKit
-import LoremSwiftum
+
+enum ItemSections: Int {
+    case alphabets, emojis
+}
+
+
 
 
 class PhotoGridCollectionViewController: UICollectionViewController {
@@ -27,8 +32,9 @@ class PhotoGridCollectionViewController: UICollectionViewController {
     
     //MARK: - Properties
     private var alphabetItems = [ItemViewModel]()
-    private var arrangedWordItems = [ItemViewModel]()
+    private var emojiItems = [ItemViewModel]()
     private let allAlphabet: String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    fileprivate let itemSections: [ItemSections] = [.alphabets, .emojis]
     
 
 
@@ -44,7 +50,7 @@ class PhotoGridCollectionViewController: UICollectionViewController {
     
     fileprivate func configureNavBar() {
         navigationItem.title = "Drag & Drop Demo"
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(didTapAddItem))
+        navigationController?.navigationBar.prefersLargeTitles = true
     }
     
     
@@ -55,12 +61,12 @@ class PhotoGridCollectionViewController: UICollectionViewController {
             alphabetItems.append(item)
         }
         
-        // setup emojis
+        // setup emojis. This is mem address of emojis
         for i in 0x1F601...0x1F64F {
             guard let scalar = UnicodeScalar(i) else { continue }
             let emoji = String(scalar)
             let item = ItemViewModel(color: generateRandomColor(), alphabet: emoji)
-            arrangedWordItems.append(item)
+            emojiItems.append(item)
         }
             
     }
@@ -84,24 +90,8 @@ class PhotoGridCollectionViewController: UICollectionViewController {
     
     
     
-
-    
-    
     //MARK: - Target Selectors
-    @objc fileprivate func didTapAddItem() {
-//        let alphabet = allAlphabet.randomElement()
-//
-//        let item = ItemViewModel(color: generateRandomColor(), alphabet: alphabet?.description ?? "")
-//        alphabetItems.insert(item, at: 0)
-//        let indexPath = IndexPath(item: 0, section: 0)
-//        collectionView.insertItems(at: [indexPath])
-        
-        
-        print("Lorem.word: ", Lorem.firstName)
-        
-    }
-    
-    
+      
     @objc fileprivate func handleLongPressGesture(gesture: UILongPressGestureRecognizer) {
         switch gesture.state {
         case .began:
@@ -116,6 +106,9 @@ class PhotoGridCollectionViewController: UICollectionViewController {
         }
     }
     
+    
+    
+    
 }
     
 
@@ -125,10 +118,13 @@ extension PhotoGridCollectionViewController: UICollectionViewDelegateFlowLayout 
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ColoredCell.cellReuseIdentifier, for: indexPath) as! ColoredCell
-        if indexPath.section == 0 {
+        switch itemSections[indexPath.section] {
+        case .alphabets:
             cell.bindDataToCell(with: alphabetItems[indexPath.item])
-        } else {
-            cell.bindDataToCell(with: arrangedWordItems[indexPath.item])
+
+        case .emojis:
+            cell.bindDataToCell(with: emojiItems[indexPath.item])
+
         }
         return cell
     }
@@ -146,11 +142,16 @@ extension PhotoGridCollectionViewController: UICollectionViewDelegateFlowLayout 
     
     
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
-        2
+        return itemSections.count
     }
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return section == 0 ? alphabetItems.count : arrangedWordItems.count
+        switch itemSections[section] {
+        case .alphabets:
+            return  alphabetItems.count
+        case .emojis:
+            return emojiItems.count
+        }
     }
     
 
@@ -178,17 +179,15 @@ extension PhotoGridCollectionViewController: UICollectionViewDelegateFlowLayout 
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: SectionTitleHeader.cellReuseIdentifier, for: indexPath) as! SectionTitleHeader
         
-        switch indexPath.section {
-        case 0:
+        switch itemSections[indexPath.section] {
+        case .alphabets:
             let attributedText = setUpHeaderTitleLabel(imageName: "rectangle.grid.3x2.fill", title: "Alphabets")
             header.titleLabel.attributedText = attributedText
             
-        case 1:
-            let attributedText = setUpHeaderTitleLabel(imageName: "rectangle.grid.3x2.fill", title: "Arranged Word")
+        case .emojis:
+            let attributedText = setUpHeaderTitleLabel(imageName: "rectangle.grid.3x2.fill", title: "Emojis")
             header.titleLabel.attributedText = attributedText
             
-        default:
-            break
         }
         return header
     }
@@ -213,24 +212,17 @@ extension PhotoGridCollectionViewController: UICollectionViewDelegateFlowLayout 
                                  to destinationIndexPath: IndexPath) {
      
         
-//        // first grab and remove item at sourceIndex
-//        let item = alphabetItems.remove(at: sourceIndexPath.item)
-//        alphabetItems.insert(item, at: destinationIndexPath.item)
-        
-        
-        
+        // determines which item to remove from data model
         let item = sourceIndexPath.section == 0 ? alphabetItems.remove(at: sourceIndexPath.item)
-        : arrangedWordItems.remove(at: sourceIndexPath.item)
+        : emojiItems.remove(at: sourceIndexPath.item)
 
+        // determines which section to move the item to
         if destinationIndexPath.section == 0 {
-
             alphabetItems.insert(item, at: destinationIndexPath.item)
         } else {
-            arrangedWordItems.insert(item, at: destinationIndexPath.item)
+            emojiItems.insert(item, at: destinationIndexPath.item)
 
         }
-        
-        
     }
     
     

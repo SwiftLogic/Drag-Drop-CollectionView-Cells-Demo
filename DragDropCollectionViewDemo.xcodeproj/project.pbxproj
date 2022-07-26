@@ -14,7 +14,6 @@
 		E94FFE22288E02BD005DE3C2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E94FFE20288E02BD005DE3C2 /* LaunchScreen.storyboard */; };
 		E995353A288E05DD00AD7040 /* ColoredCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9953539288E05DD00AD7040 /* ColoredCell.swift */; };
 		E995353C288EE64E00AD7040 /* SectionTitleHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = E995353B288EE64E00AD7040 /* SectionTitleHeader.swift */; };
-		E995353F288F281400AD7040 /* LoremSwiftum in Frameworks */ = {isa = PBXBuildFile; productRef = E995353E288F281400AD7040 /* LoremSwiftum */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,7 +33,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E995353F288F281400AD7040 /* LoremSwiftum in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -89,7 +87,6 @@
 			);
 			name = DragDropCollectionViewDemo;
 			packageProductDependencies = (
-				E995353E288F281400AD7040 /* LoremSwiftum */,
 			);
 			productName = DragDropCollectionViewDemo;
 			productReference = E94FFE12288E02B9005DE3C2 /* DragDropCollectionViewDemo.app */;
@@ -120,7 +117,6 @@
 			);
 			mainGroup = E94FFE09288E02B9005DE3C2;
 			packageReferences = (
-				E995353D288F281300AD7040 /* XCRemoteSwiftPackageReference "LoremSwiftum" */,
 			);
 			productRefGroup = E94FFE13288E02B9005DE3C2 /* Products */;
 			projectDirPath = "";
@@ -364,25 +360,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		E995353D288F281300AD7040 /* XCRemoteSwiftPackageReference "LoremSwiftum" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/lukaskubanek/LoremSwiftum.git";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		E995353E288F281400AD7040 /* LoremSwiftum */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E995353D288F281300AD7040 /* XCRemoteSwiftPackageReference "LoremSwiftum" */;
-			productName = LoremSwiftum;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E94FFE0A288E02B9005DE3C2 /* Project object */;
 }
